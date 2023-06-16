@@ -2,21 +2,30 @@ class Solution {
 public:
     int maximumCount(vector<int>& nums)
     {
-        int pos_cnt = 0;
-        int neg_cnt = 0;
-        
-        for(int i = 0; i < nums.size(); i++)
+        int left = 0;
+        int right = nums.size() - 1;
+        int pos_count = 0;
+        int neg_count = 0;
+
+        while(left <= right)
         {
-            if(nums[i] > 0)
+            if(nums[left] < 0)
             {
-                pos_cnt++;
+                neg_count++;
+                left++;
             }
-            else if(nums[i] < 0)
+            else if(nums[right] > 0)
             {
-                neg_cnt++;
+                pos_count++;
+                right--;
+            }
+            else
+            {
+                left++;
+                right--;
             }
         }
 
-        return max(pos_cnt, neg_cnt);
+        return max(pos_count, neg_count);
     }
 };
