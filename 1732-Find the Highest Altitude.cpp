@@ -2,16 +2,14 @@ class Solution {
 public:
     int largestAltitude(vector<int>& gain)
     {
+        vector<int> altitudes;
         int current = 0;
-        int max_altitude = INT_MIN;
-        for(int i = 0; i < gain.size(); i++)
+        for(int i = 0; i<gain.size(); i++)
         {
-            current += gain[i];
-            max_altitude = max(max_altitude, current);
+          altitudes.push_back(current);
+          current = current + gain[i];
         }
-        // Initial altitude is 0 so a negative value cannot be the max value
-        if(max_altitude < 0)
-            max_altitude = 0;
-        return max_altitude;   
+        altitudes.push_back(current);
+        return *max_element(altitudes.begin(),altitudes.end());
     }
 };
