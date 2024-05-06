@@ -24,58 +24,76 @@ class Solution
       if(head->next == nullptr)
         return head;
       
-      // Create our iters
-      ListNode* p0 = head;
-      ListNode* p1 = head;
-      ListNode* p2 = head->next;
-      
-      // Very very naive approach - essentially bubble sort the list
-      while(p1 != nullptr && p1->next != nullptr)
+      // Find the max value in the list
+      ListNode *p1 = head;
+      ListNode *p2 = head;
+      int max = head->val;
+      while(p1 != nullptr)
       {
-        //std::cout << "*****\nBeginning comparison with p1 value " << p1->val << "\n";
-        p2 = p1;
-        while(p2->next != nullptr)
+        if(p1->val > max)
         {
-          p2 = p2->next;
-          //std::cout << "\tp1 " << p1->val << "\tp2 " << p2->val << "\n";
-          if(p2->val > p1->val)
-          {
-            //std::cout << "\t\tRemoving the node at p1\n";
-            // Remove the current p1
-            // Check if we are still at the head / front of the list
-            if(p1 == head)
-            {
-              // Update the head and the p1 and p0 values
-              head = head->next;
-              //free(p1);
-              p1 = head;
-              p0 = head;
-            }            
-            else
-            {
-              // If we are not at the head / front of the list we want to remove the node at p1
-              // We use the node p0 to do this, p0 points at the node p1->prev(if that existed)
-              // Update p0 to skip the node at the current p1
-              p0->next = p1->next;
-              //free(p1)
-              // Update p1 to be the node 1 after p0 again
-              p1 = p0->next;
-            }
-            //std::cout << "*****\nBeginning comparison with p1 value " << p1->val << "\n";
-            // Reset our loop now that we removed p1
-            p2 = p1;
-          }
+          max = p1->val;
+          p2 = p1;
         }
         p1 = p1->next;
-        // Update the node we are storing that is 1 behind p1
-        while(p0->next != p1)
+      }
+      
+      // Remove all entries to the left of the max entry
+      // Memory leaking here?
+      /*
+      p1 = head;
+      while(p1 != p2)
+      {
+        ListNode *tmp = p1->next;
+        free(p1);
+        p1 = tmp;
+      }
+      head = p1;
+      */
+      head = p2;
+      
+      // Find the next max until we are done
+      ListNode* p0 = head;
+      p1 = head;
+      while(p1 != nullptr)
+      {
+        ListNode* pMax = findNextMax(p1);
+        std::cout << "Current value is " << p1->val << "\n";
+        std::cout << "the next max value is " << pMax->val << "\n";
+      
+        if(pMax == p1)
         {
-          p0 = p0->next;
+          // We are done?
+          break;
         }
+        else
+        {
+          p0->next = pMax;
+          //free(p1);
+          p1 = p0->next;
+        }      
       }
       
       return head;
     }
+    
+    
+    
 	private:
+    ListNode* findNextMax(ListNode* start)
+    {
+      ListNode* nextMax = start;
+      ListNode* iter = start;
+      while(iter != nullptr)
+      {
+        if(iter->val > nextMax->val)
+        {
+          nextMax = iter;
+        }
+        iter = iter->next;
+      }
+      
+      return nextMax;
+    }
 
 };
