@@ -1,16 +1,16 @@
 // 2487 Remove nodes from linked list
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
- 
+
+//  Definition for singly-linked list.
+struct ListNode 
+{
+  int val;
+  ListNode *next;
+  ListNode() : val(0), next(nullptr) {}
+  ListNode(int x) : val(x), next(nullptr) {}
+  ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
 // leecode doesnt like my calls to free - makes sense
 // My thinking was that we have a memory leak if we dont clear up the memory of removed nodes though
 // Unsure how we are supposed to actually handle that in leetcodes enviornment
@@ -20,80 +20,57 @@ class Solution
 	public:
 		ListNode* removeNodes(ListNode* head)
     {
-      // Early exit if list is only 1 entry
-      if(head->next == nullptr)
-        return head;
-      
-      // Find the max value in the list
+      head = reverseList(head);
       ListNode *p1 = head;
-      ListNode *p2 = head;
-      int max = head->val;
-      while(p1 != nullptr)
+      ListNode *p2 = head->next;
+      
+      // Move through the list in reverse order
+      while(p2 != nullptr)
       {
-        if(p1->val > max)
+        std::cout << "P1: " << p1->val << "P2: " << p2->val << '\n';
+        if(p2->val >= p1->val)
         {
-          max = p1->val;
-          p2 = p1;
+          // delete all the nodes between p1 and p2
+          p1->next = p2;
+          p1 = p2;
         }
-        p1 = p1->next;
-      }
-      
-      // Remove all entries to the left of the max entry
-      // Memory leaking here?
-      /*
-      p1 = head;
-      while(p1 != p2)
-      {
-        ListNode *tmp = p1->next;
-        free(p1);
-        p1 = tmp;
-      }
-      head = p1;
-      */
-      head = p2;
-      
-      // Find the next max until we are done
-      ListNode* p0 = head;
-      p1 = head;
-      while(p1 != nullptr)
-      {
-        ListNode* pMax = findNextMax(p1);
-        std::cout << "Current value is " << p1->val << "\n";
-        std::cout << "the next max value is " << pMax->val << "\n";
-      
-        if(pMax == p1)
+
+        // Check if we are at the end of the list and havent hit a new max
+        // Corner case if they are matching values
+        if(p2->next == nullptr)
         {
-          // We are done?
-          break;
+          if(p2->val != p1->val)
+          {
+            p1->next = nullptr;
+            break;
+          }
         }
-        else
-        {
-          p0->next = pMax;
-          //free(p1);
-          p1 = p0->next;
-        }      
+
+        p2 = p2->next;
       }
-      
+
+      head = reverseList(head);
+
       return head;
     }
     
     
     
 	private:
-    ListNode* findNextMax(ListNode* start)
+    ListNode* reverseList(ListNode *head)
     {
-      ListNode* nextMax = start;
-      ListNode* iter = start;
-      while(iter != nullptr)
+      ListNode *curr = head;
+      ListNode *prev = nullptr;
+
+      while(curr != nullptr)
       {
-        if(iter->val > nextMax->val)
-        {
-          nextMax = iter;
-        }
-        iter = iter->next;
+        ListNode* next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;        
       }
-      
-      return nextMax;
+
+      return prev;
     }
 
 };
