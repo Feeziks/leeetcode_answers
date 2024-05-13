@@ -22,76 +22,49 @@ public:
             monsters.push_back(tmp);
         }
 
-        print(monsters);
-
-        return 0;
-
-
-        std::vector<int> arrivalTimes;
-        for(int i = 0; i < dist.size(); i++)
-        {
-            arrivalTimes.push_back(dist[i]/speed[i]);
-        }
-        // Sort least to greatest
-        print(arrivalTimes);
-        std::sort(arrivalTimes.begin(), arrivalTimes.end());
-        print(arrivalTimes);
-        // We start with weapon charged - remove the first entry
-        int monstersEliminated = 1;
-        arrivalTimes.erase(arrivalTimes.begin());
+        int monstersEliminated = 0;
         int currTime = 0;
-        bool alive = arrivalTimes[0] > currTime;
-
+        bool alive = true;
         while(alive)
         {
-            currTime++;
-            std::cout << "Looping\n\t";
-            print(arrivalTimes);
-            std::cout << "\tcurrTime: " << currTime << " arrivalTimes[0]: " << arrivalTimes[0];
-            if(arrivalTimes[0] > currTime)
+            //print(monsters);
+            // Eliminate the closest monster
+            float minArrivalTime = std::numeric_limits<float>::max();
+            int minIdx = -1;
+            for(int i = 0; i < monsters.size(); i++)
             {
-                arrivalTimes.erase(arrivalTimes.begin());
-                // Was this the last monster?
-                if(arrivalTimes.empty())
+                // check if we are already dead
+                if(monsters[i].arrivalTime <= currTime)
                 {
-                    std::cout << " last monster eliminated\n";
-                    monstersEliminated++;
+                    alive = false;
                     break;
                 }
 
-                std::cout << " new arrivalTimes[0]: " << arrivalTimes[0];
-
-                // see if another monster has the same arrival time
-                if(arrivalTimes[0] <= currTime)
+                if(monsters[i].arrivalTime < minArrivalTime)
                 {
-                    std::cout << " another monster arrived at the same time\n";
-                    alive = false;
-                }
-                else
-                {
-                    std::cout << " ending this loop\n";
-                    alive = true;
-                    monstersEliminated++;
+                    minArrivalTime = monsters[i].arrivalTime;
+                    minIdx = i;
                 }
             }
-            else
+            if(!alive)
             {
-                std::cout << " You died\n";
-                alive = false;
+                break;
+            }
+
+            //std::cout << "currTime " << currTime << " Removing the monster at index " << minIdx << " which has an arrival time of " << minArrivalTime << "\n";
+
+            // Remove the monster at the minimum time
+            monsters.erase(monsters.begin() + minIdx);
+            monstersEliminated++;
+            // increment the time for the next iteration
+            currTime++;
+            //check if we are out of monsters
+            if(monsters.empty())
+            {
+                break;
             }
         }
-        
-
         return monstersEliminated;
-    }
-
-    void print(std::vector<int> &v)
-    {
-        for(auto x : v)
-        {
-            std::cout << x << " ";
-        }
-        std::cout << "\n";
     }
 
     void print(std::vector<monsterData_t> &v)
