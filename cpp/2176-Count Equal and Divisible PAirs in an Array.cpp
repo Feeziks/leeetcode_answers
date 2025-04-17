@@ -1,4 +1,3 @@
-#include <map>
 #include <vector>
 #include <iostream>
 
@@ -7,26 +6,22 @@ class Solution
 public:
   int countPairs(vector<int>& nums, int k)
   {
-    std::map<int, std::vector<int>> valsToIdxs;
-    for(size_t i = 0; i < nums.size(); i++)
-    {
-      valsToIdxs[nums[i]].push_back(i);
-    }
-
     int ret = 0;
-    for(auto it = valsToIdxs.begin(); it != valsToIdxs.end(); it++)
+    int numsSize = nums.size();
+    for(int i = 0; i < numsSize; i++)
     {
-      for(size_t i = 0; i < it->second.size() - 1; i++)
+      for(int j = i + 1; j < numsSize; j++)
       {
-        for(size_t j = i + 1; j < it->second.size(); j++)
+        if(nums[i] == nums[j])
         {
-          if(0 == it->second[i] * it->second[j] % k)
+          if(0 == (i * j) % k)
           {
             ret++;
           }
         }
       }
     }
+    
     return ret;
   }
 };
