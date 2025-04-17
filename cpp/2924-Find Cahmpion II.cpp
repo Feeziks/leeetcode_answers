@@ -1,30 +1,61 @@
 #include <vector>
 #include <iostream>
-#include <algorithm>
+#include <cstdint>
+
+#define IS_BIT_SET(var, pos) ((var) & (1ll << (pos)))
+#define SET_BIT(var, pos) ((var) |= (1ll << (pos)))
 
 class Solution
 {
 public:
-  int findChampion(int n, const vector<vector<int>>& edges)
+  int findChampion(const int n, const vector<vector<int>>& edges)
   {
-    std::vector<bool> isTeamPointedToInEdges(n, false);
+    // Question states that n is between 1 and 100 inclusive
+    // 2 64 bit values gives us 128 bits to use
+    uint64_t isTeamPointedToInEdges[2];
+    isTeamPointedToInEdges[0] = 0;
+    isTeamPointedToInEdges[1] = 0;
     int m = edges.size();
     int champion = -1;
-    for(int i = 0; i < m; i++)
+    for(uint64_t i = 0; i < m; i++)
     {
-      isTeamPointedToInEdges[edges[i][1]] = true;
+      uint64_t teamPointedTo = edges[i][1];
+      //std::cout << "teamPointedTo " << teamPointedTo << "\n";
+      if(teamPointedTo < 64)
+      {
+        SET_BIT(isTeamPointedToInEdges[0], teamPointedTo);
+        //isTeamPointedToInEdges[0] |= 1 << teamPointedTo;
+      }
+      else
+      {
+        SET_BIT(isTeamPointedToInEdges[1], teamPointedTo - 64);
+        //isTeamPointedToInEdges[1] |= 1 << (teamPointedTo - 64);
+      }
     }
 
-    for(size_t i = 0; i < isTeamPointedToInEdges.size(); i++)
+    for(int i = 0; i < n; i++)
     {
-      if(isTeamPointedToInEdges[i] == false)
+      if(i < 64)
       {
-        if(champion != -1)
+        if(0 == IS_BIT_SET(isTeamPointedToInEdges[0], i))
         {
-          champion = -1;
-          break;
+          if(champion != -1)
+          {
+            return -1;
+          }
+          champion = i;
         }
-        champion = i;
+      }
+      else
+      {
+        if(0 == IS_BIT_SET(isTeamPointedToInEdges[1], i - 64))
+        {
+          if(champion != -1)
+          {
+            return -1;
+          }
+          champion = i;
+        }
       }
     }
     return champion;
