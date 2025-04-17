@@ -11,10 +11,8 @@ public:
 
     for(size_t i = 0; i < guards.size(); i++)
     {
-      for(size_t dir = 0; dir < 4; dir++)
-      {
-
-      }
+      // Check North
+      for(size_t j = guards[i]; j < )
     }
 
 
