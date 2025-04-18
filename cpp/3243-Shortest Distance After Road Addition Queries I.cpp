@@ -50,17 +50,7 @@ public:
     {
       cityConnections[i] = {i - 1};
     }
-
-    // for(const auto &pair : cityConnections)
-    // {
-    //   std::cout << "city: " << pair.first << ", vector of connections ";
-    //   for(size_t i = 0; i < pair.second.size(); i++)
-    //   {
-    //     std::cout << pair.second[i] << ", ";
-    //   }
-    //   std::cout << "\n";
-    // }
-
+    
     for(size_t i = 0; i < numQueries; i++)
     {
     // After applying each queury we need to find the shortest path and append it to the return value
