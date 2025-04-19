@@ -6,35 +6,26 @@
 class Solution
 {
 private:
-  std::vector<std::vector<std::vector<int>>> constructAdjList(std::map<int, std::vector<std::vector<int>>> &edges, int num)
+  inline bool isOutside(int i, int j, int n, int m)
   {
-    std::vector<std::vector<std::vector<int>>> adj(num);
-    for(const auto &pair : edges)
-    {
-      int u = pair.first;
-      for(int i = 0; i < edges[pair.first].size(); i++)
-      {
-        int v = edges[u][i][1];
-        int wt = edges[u][i][2];
-        adj[u].push_back({v, wt});
-        //adj[v].push_back({u, wt});
-        // std::cout<< "u " << u << " v " << v << " wt " << wt << " size " << adj[u].size() << "\n";
-      }
-      // std::cout<< "adj[" << u << "] ";
-      for(int i = 0; i < adj[u].size(); i++)
-      {
-        // std::cout<< adj[u][i][0] << " " << adj[u][i][1] << ",   ";
-      }
-      // std::cout<< "\n";
-    }
-    return adj;
+    return i < 0 || i >= n || j < 0 || j >= m;
+  }
+  inline int toIdx(int i, int j, int m)
+  {
+    return i * m + j;
+  }
+  inline std::tuple<int, int> fromIdx(int idx, int m)
+  {
+    return std::make_tuple(idx / m, idx % m);
   }
 
-  std::vector<int> dijkstra(int num, std::map<int, std::vector<std::vector<int>>> &edges, int src)
+  int dijkstra(const vector<vector<int>>& grid, int src)
   {
-    std::vector<std::vector<std::vector<int>>> adjList = constructAdjList(edges, num);
+    int n = grid.size();
+    int m = grid[0].size();
+
     std::priority_queue<std::vector<int>, std::vector<std::vector<int>>, std::greater<std::vector<int>>> prioQ;
-    std::vector<int> distances(num, INT_MAX);
+    std::vector<int> distances(n * m,  INT_MAX);
 
     prioQ.push({0, src});
     distances[src] = 0;
@@ -43,94 +34,49 @@ private:
     {
       int u = prioQ.top()[1];
       prioQ.pop();
-      // std::cout<< "\n";
-      // std::cout<< "u " << u;
-      for(auto neighbor : adjList[u])
+      if(u == n * m -1)
       {
-        int next = neighbor[0];
-        int weight = neighbor[1];
-        // std::cout<< " next " << next;
-        // std::cout<< " distances[next] = " << distances[next];
-        // std::cout<< " distances[u] " << distances[u];
-        // std::cout<< " weight " << weight << "\n";
-        if(distances[next] > distances[u] + weight)
+        return distances[u];
+      }
+      
+      for(int i = 0; i < 4; i++)
+      {
+        int nextIdx = 0;
+        switch(i)
         {
-          distances[next] = distances[u] + weight;
-          prioQ.push({distances[next], next});
+          case 0: //right
+            nextIdx = u + 1;
+            break;
+          case 1: //down
+            nextIdx = u + m;
+            break;
+          case 2: //left
+            nextIdx = u - 1;
+            break;
+          case 3: // up
+            nextIdx = u + m;
+            break;
+        }
+        int r = std::get<0>(fromIdx(nextIdx, m));
+        int c = std::get<1>(fromIdx(nextIdx, m));
+        if(isOutside(r, c, n, m))
+        {
+          continue;
+        }
+        int nextDistance = grid[r][c] + distances[u];
+        if(nextDistance < distances[nextIdx])
+        {
+          distances[nextIdx] = nextDistance;
+          prioQ.push({nextDistance, nextIdx});
         }
       }
-      if(u == num - 1)
-        break;
     }
-    for(int i = 0; i < distances.size(); i++)
-    {
-        // std::cout<< distances[i] << "\n";
-    }
-    return distances;
+    return -1;
   }
 public:
   int minimumObstacles(vector<vector<int>>& grid)
   {
-    // Construct the edges vector and weights
-    std::map<int, std::vector<std::vector<int>>> edges;
-    int n = grid.size();
-    int m = grid[0].size();
-    if(n == 1)
-    {
-        //std::cout <<" shits flat \n";
-        return std::accumulate(grid[0].begin(), grid[0].end(), 0);
-    }
-    // std::cout<< "n " << n << " m " << m << "\n";
-    for(int i = 0; i < n; i++)
-    {
-      for(int j = 0; j < m; j++)
-      {
-        int thisCell = i*m + j;
-        // std::cout<< "thisCell " << thisCell << " i " << i << " j " << j << " grid[i][j] " << grid[i][j] <<" ";
-        // Go right
-        if(j + 1 < m)
-        {
-          // std::cout<< "right grid[i][j + 1] " << grid[i][j + 1] << " ";
-          edges[thisCell].push_back({thisCell, thisCell + 1, grid[i][j + 1]});
-        }
-        // Go Down
-        if(i + 1 < n)
-        {
-          // std::cout<< "down grid[i+1][j] " << grid[i + 1][j] << " ";
-          edges[thisCell].push_back({thisCell, (i + 1) * m + j, grid[i + 1][j]});
-        }
-        // Go Left
-        if(j - 1 >= 0)
-        {
-          // std::cout<< "left grid[i][j-1] " << grid[i][j-1] << " ";
-          edges[thisCell].push_back({thisCell, thisCell - 1, grid[i][j - 1]});
-        }
-        // Go Up
-        if(i - 1 >= 0)
-        {
-          // std::cout<< "up grid[i-1][j] " << grid[i-1][j] << " ";
-          edges[thisCell].push_back({thisCell, (i - 1) * m + j, grid[i - 1][j]});
-        }
-        // std::cout<< "\n";
-      }
-    }
-    
-    // // std::cout<< "edges\n";
-    // for(const auto &pair : edges)
-    // {
-    //   for(int i = 0; i < edges[pair.first].size(); i++)
-    //   {
-    //     // std::cout<< "edges[" << pair.first << "] ";
-    //     // std::cout<< "source " << edges[pair.first][i][0] << " ";
-    //     // std::cout<< "dest " << edges[pair.first][i][1] << " ";
-    //     // std::cout<< "weight " << edges[pair.first][i][2] << "\n";
-    //   }
-    //   // std::cout<< "\n";
-    // }
-    
-
     // Call dijkstra with the  grid and return the distance from 0 to the last entry in the grid
-    std::vector<int> distances = dijkstra(n * m, edges, 0);
-    return distances[distances.size() - 1];
+    return dijkstra(grid, 0);
   }
 };
