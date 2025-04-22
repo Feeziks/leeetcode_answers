@@ -8,25 +8,61 @@ public:
   int maxCount(vector<int>& banned, int n, int maxSum)
   {
     int ret = 0;
+    int sum = 0;
     std::sort(banned.begin(), banned.end());
-    std::vector<int> legalValues;
     int bannedIdx = 0;
-    for(int i = 1; i <= n; i++)
+    int idx = 1;
+    while(idx <= n)
     {
-      while(banned[bannedIdx] < i && bannedIdx < banned.size())
+      // std::cout << bannedIdx << "  " << idx;
+      if(bannedIdx >= banned.size())
       {
+        // std::cout << " bannedIdx > banned.size()";
+        sum += idx;
+        if(sum <= maxSum)
+        {
+          ret++;
+          idx++;
+          continue;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      if(banned[bannedIdx] == idx)
+      {
+        // std::cout << " banned[bannedIdx] == idx";
         bannedIdx++;
+        idx++;
       }
-      if(bannedIdx >= banned.size() || banned[bannedIdx] != i)
+      else if(banned[bannedIdx] < idx)
       {
-        legalValues.push_back(i);
+        // std::cout << " banned[bannedIdx] < idx";
+        while(bannedIdx < banned.size() && banned[bannedIdx] < idx)
+        {
+          bannedIdx++;
+        }
       }
+      else
+      {
+        // std::cout << " banned[bannedIdx] > idx";
+        sum += idx;
+        if(sum <= maxSum)
+        {
+          ret++;
+          idx++;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      // std::cout << "\n";
     }
-    for(const auto val : legalValues)
-    {
-      std::cout << val << ", ";
-    }
-    std::cout <<"\n";
+
     return ret;
   }
 };
