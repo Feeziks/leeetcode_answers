@@ -2,11 +2,43 @@
 #include <iostream>
 #include <set>
 #include <unordered_map>
+#include <bitset>
 
 class Solution
 {
 public:
-  int countCompleteSubarrays(vector<int>& nums)
+  int countCompleteSubarrays(const std::vector<int> &nums)
+  {
+    int numsSize = nums.size();
+    const size_t constraintMaxNumsValue = 2000;
+    std::bitset<constraintMaxNumsValue + 1> uniqueElems;
+
+    for(const int val : nums)
+    {
+      uniqueElems.set(val);
+    }
+
+    int leftPtr = 0;
+    int ret = 0;
+    while(leftPtr < numsSize)
+    {
+      std::bitset<constraintMaxNumsValue + 1> currentElems;
+      int rightPtr = leftPtr;
+      while(rightPtr < numsSize)
+      {
+        currentElems.set(nums[rightPtr]);
+        if(currentElems == uniqueElems)
+        {
+          ret++;
+        }
+        rightPtr++;
+      }
+      leftPtr++;
+    }
+    return ret;
+  }
+
+  int countCompleteSubarraysFirstApproach(vector<int>& nums)
   {
     // Early out
     if(nums.size() == 1)
